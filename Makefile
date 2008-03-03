@@ -1,31 +1,40 @@
 PROGRAM=ocamlobjs
 
-MAIN_OBJS=src/main.cmo
-TEST_OBJS=
+OBJS=
+PROGRAM_OBJS=src/main.cmo
+TEST_OBJS=tests/testCase.cmo tests/test_deps.cmo tests/suite.cmo
 
 # Commands
-OCAMLC=ocamlc
-OCAMLOPT=ocamlopt
-OCAMLDEP=ocamldep
-INCLUDES=str.cma
-OCAMLFLAGS=${INCLUDES}
-OCAMLOPTFLAGS=${INCLUDES}
+OCAMLC=ocamlfind ocamlc
+OCAMLOPT=ocamlfind ocamlopt
+OCAMLDEP=ocamlfind ocamldep
+INCLUDES=-package oUnit -linkpkg -I tests
+OCAMLFLAGS=${INCLUDES} str.cma
+OCAMLOPTFLAGS=${INCLUDES} str.cmxa
 
-all: ${PROGRAM}
+all: bin/byte/${PROGRAM}
+opt: bin/opt/${PROGRAM}
 
-${PROGRAM}: ${MAIN_OBJS}
-	${OCAMLC} -o bin/byte/${PROGRAM} ${OCAMLFLAGS} ${MAIN_OBJS}
-tests: ${MAIN_OBJS} ${TEST_OBJS}
-	${OCAMLC} -o bin/byte/tests ${OCAMLFLAGS} ${MAIN_OBJS} ${TEST_OBJS}
+test: bin/byte/tests
+	bin/byte/tests
+test-opt: bin/opt/tests
+	bin/opt/tests
+
+bin/byte/${PROGRAM}: ${OBJS} ${PROGRAM_OBJS}
+	${OCAMLC} -o $@ ${OCAMLFLAGS} ${OBJS} ${PROGRAM_OBJS}
+bin/byte/tests: ${PROGRAM_OBJS} ${TEST_OBJS}
+	${OCAMLC} -o $@ ${OCAMLFLAGS} ${OBJS} ${TEST_OBJS}
+
 
 # Definitions for native code compiled executables.
-MAIN_OPT_OBJS=${MAIN_OBJS:.cmo=.cmx}
+OPT_OBJS=${OBJS:.cmo=.cmx}
+PROGRAM_OPT_OBJS=${PROGRAM_OBJS:.cmo=.cmx}
 TEST_OPT_OBJS=${TEST_OBJS:.cmo=.cmx}
 
-${PROGRAM}-opt: ${MAIN_OPT_OBJS}
-	${OCAMLOPT} -o bin/opt/${PROGRAM} ${OCAMLOPTFLAGS} ${MAIN_OPT_OBJS}
-tests-opt: ${MAIN_OPT_OBJS} ${TEST_OPT_OBJS}
-	${OCAMLOPT} -o bin/opt/$tests ${OCAMLOPTFLAGS} ${MAIN_OPT_OBJS} ${TEST_OPT_OBJS}
+bin/opt/${PROGRAM}: ${OPT_OBJS} ${PROGRAM_OPT_OBJS}
+	${OCAMLOPT} -o $@ ${OCAMLOPTFLAGS} ${OBJS} ${PROGRAM_OPT_OBJS}
+bin/opt/tests: ${PROGRAM_OPT_OBJS} ${TEST_OPT_OBJS}
+	${OCAMLOPT} -o $@ ${OCAMLOPTFLAGS} ${OPT_OBJS} ${TEST_OPT_OBJS}
 
 # Common rules
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
@@ -47,6 +56,6 @@ clean:
 
 # Dependencies
 depend:
-	${OCAMLDEP} ${INCLUDES} *.mli *.ml > .depend
+	${OCAMLDEP} ${INCLUDES} -I src -I tests *.mli *.ml > .depend
 
 include .depend
