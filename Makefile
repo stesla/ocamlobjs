@@ -1,9 +1,10 @@
 PROGRAM=ocamlobjs
 
-OBJS=src/dep.cmo src/parse.cmo src/main.cmo
+OBJS=src/dependency.cmo src/parser.cmo src/main.cmo
 XOBJS=${OBJS:.cmo=.cmx}
 
-TEST_OBJS=tests/testCase.cmo tests/test_deps.cmo tests/suite.cmo
+TEST_OBJS=src/dependency.cmo \
+	tests/testCase.cmo tests/test_dependency.cmo tests/suite.cmo
 TEST_XOBJS=${TEST_OBJS:.cmo=.cmx}
 
 # Commands

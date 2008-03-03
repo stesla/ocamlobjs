@@ -1,8 +1,6 @@
-./src/main.cmo: src/parse.cmo src/dep.cmo 
-./src/main.cmx: src/parse.cmx src/dep.cmx 
-./src/parse.cmo: src/dep.cmo 
-./src/parse.cmx: src/dep.cmx 
-./tests/suite.cmo: tests/test_deps.cmo 
-./tests/suite.cmx: tests/test_deps.cmx 
-./tests/test_deps.cmo: tests/testCase.cmo 
-./tests/test_deps.cmx: tests/testCase.cmx 
+./src/main.cmo: src/dependency.cmo 
+./src/main.cmx: src/dependency.cmx 
+./src/parser.cmo: src/dependency.cmo 
+./src/parser.cmx: src/dependency.cmx 
+./tests/test_dependency.cmo: tests/testCase.cmo 
+./tests/test_dependency.cmx: tests/testCase.cmx 

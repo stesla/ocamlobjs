@@ -18,6 +18,6 @@ let rec parse_dependencies deps =
   try
     let line = read_line_with_continue "" in
     let dep = split_dep_line line in
-    parse_dependencies (Dep.Set.add dep deps)
+    parse_dependencies (Dependency.Set.add dep deps)
   with End_of_file ->
     deps
