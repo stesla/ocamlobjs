@@ -1,6 +1,6 @@
 PROGRAM=ocamlobjs
 
-OBJS=src/main.cmo
+OBJS=src/dep.cmo src/parse.cmo src/main.cmo
 XOBJS=${OBJS:.cmo=.cmx}
 
 TEST_OBJS=tests/testCase.cmo tests/test_deps.cmo tests/suite.cmo
@@ -10,7 +10,7 @@ TEST_XOBJS=${TEST_OBJS:.cmo=.cmx}
 OCAMLC=ocamlfind ocamlc
 OCAMLOPT=ocamlfind ocamlopt
 OCAMLDEP=ocamlfind ocamldep
-INCLUDES=
+INCLUDES=-I src
 TEST_INCLUDES=-package oUnit -linkpkg -I tests
 OCAMLFLAGS=${INCLUDES} str.cma
 OCAMLOPTFLAGS=${INCLUDES} str.cmxa
@@ -62,7 +62,8 @@ clean:
 
 # Dependencies
 .PHONY: depend
+depend: SOURCES=${shell find . -name '*.ml*' -print}
 depend:
-	${OCAMLDEP} ${INCLUDES} -I src -I tests *.mli *.ml > .depend
+	${OCAMLDEP} ${INCLUDES} -I src -I tests ${SOURCES} > .depend
 
 include .depend
