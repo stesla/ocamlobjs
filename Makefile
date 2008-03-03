@@ -1,40 +1,45 @@
 PROGRAM=ocamlobjs
 
-OBJS=
-PROGRAM_OBJS=src/main.cmo
+OBJS=src/main.cmo
+XOBJS=${OBJS:.cmo=.cmx}
+
 TEST_OBJS=tests/testCase.cmo tests/test_deps.cmo tests/suite.cmo
+TEST_XOBJS=${TEST_OBJS:.cmo=.cmx}
 
 # Commands
 OCAMLC=ocamlfind ocamlc
 OCAMLOPT=ocamlfind ocamlopt
 OCAMLDEP=ocamlfind ocamldep
-INCLUDES=-package oUnit -linkpkg -I tests
+INCLUDES=
+TEST_INCLUDES=-package oUnit -linkpkg -I tests
 OCAMLFLAGS=${INCLUDES} str.cma
 OCAMLOPTFLAGS=${INCLUDES} str.cmxa
 
+# Definitions for building byte-compiled executables
 all: bin/byte/${PROGRAM}
-opt: bin/opt/${PROGRAM}
 
 test: bin/byte/tests
 	bin/byte/tests
+
+bin/byte/${PROGRAM}: ${OBJS}
+	${OCAMLC} -o $@ ${OCAMLFLAGS} ${OBJS}
+
+bin/byte/tests: INCLUDES += ${TEST_INCLUDES}
+bin/byte/tests: ${TEST_OBJS}
+	${OCAMLC} -o $@ ${OCAMLFLAGS} ${TEST_OBJS}
+
+# Targets for building native-compiled executables
+opt: bin/opt/${PROGRAM}
+
 test-opt: bin/opt/tests
 	bin/opt/tests
 
-bin/byte/${PROGRAM}: ${OBJS} ${PROGRAM_OBJS}
-	${OCAMLC} -o $@ ${OCAMLFLAGS} ${OBJS} ${PROGRAM_OBJS}
-bin/byte/tests: ${PROGRAM_OBJS} ${TEST_OBJS}
-	${OCAMLC} -o $@ ${OCAMLFLAGS} ${OBJS} ${TEST_OBJS}
+bin/opt/${PROGRAM}: ${XOBJS}
+	${OCAMLOPT} -o $@ ${OCAMLOPTFLAGS} ${XOBJS}
 
-
-# Definitions for native code compiled executables.
-OPT_OBJS=${OBJS:.cmo=.cmx}
-PROGRAM_OPT_OBJS=${PROGRAM_OBJS:.cmo=.cmx}
-TEST_OPT_OBJS=${TEST_OBJS:.cmo=.cmx}
-
-bin/opt/${PROGRAM}: ${OPT_OBJS} ${PROGRAM_OPT_OBJS}
-	${OCAMLOPT} -o $@ ${OCAMLOPTFLAGS} ${OBJS} ${PROGRAM_OPT_OBJS}
-bin/opt/tests: ${PROGRAM_OPT_OBJS} ${TEST_OPT_OBJS}
-	${OCAMLOPT} -o $@ ${OCAMLOPTFLAGS} ${OPT_OBJS} ${TEST_OPT_OBJS}
+bin/opt/tests: INCLUDES += ${TEST_INCLUDES}
+bin/opt/tests: ${TEST_XOBJS}
+	${OCAMLOPT} -o $@ ${OCAMLOPTFLAGS} ${TEST_XOBJS}
 
 # Common rules
 .SUFFIXES: .ml .mli .cmo .cmi .cmx
@@ -49,12 +54,14 @@ bin/opt/tests: ${PROGRAM_OPT_OBJS} ${TEST_OPT_OBJS}
 	${OCAMLOPT} ${OCAMLOPTFLAGS} -c $<
 
 # Clean up
+.PHONY: clean
 clean:
 	rm -f bin/byte/* bin/opt/*
 	find . -name '*.cm[iox]' -exec rm {} \;
 	find . -name '*.o' -exec rm {} \;
 
 # Dependencies
+.PHONY: depend
 depend:
 	${OCAMLDEP} ${INCLUDES} -I src -I tests *.mli *.ml > .depend
 
