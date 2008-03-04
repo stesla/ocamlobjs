@@ -14,10 +14,17 @@ let split_dep_line str =
     [file; deps] -> (file, Str.split (Str.regexp "[ \t]+") deps)
   | _ -> raise (Invalid_input str)
 
+let is_object_file file =
+  try
+    Str.search_forward (Str.regexp "\\.cm[ox]$") file 0 <> 0
+  with Not_found ->
+    false
+
 let rec parse_dependencies deps =
   try
     let line = read_line_with_continue "" in
     let (file, file_deps) = split_dep_line line in
-    parse_dependencies (Dependency.Map.add file file_deps deps)
+    let filtered_deps = List.filter is_object_file file_deps in
+    parse_dependencies (Dependency.Map.add file filtered_deps deps)
   with End_of_file ->
     deps

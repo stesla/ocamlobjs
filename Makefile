@@ -1,10 +1,9 @@
 PROGRAM=ocamlobjs
 
-OBJS=src/dependency.cmo src/parser.cmo src/main.cmo
+OBJS=${shell cat .objs}
 XOBJS=${OBJS:.cmo=.cmx}
 
-TEST_OBJS=src/dependency.cmo \
-	tests/testCase.cmo tests/test_dependency.cmo tests/suite.cmo
+TEST_OBJS=${shell cat .test_objs}
 TEST_XOBJS=${TEST_OBJS:.cmo=.cmx}
 
 # Commands
@@ -63,7 +62,7 @@ clean:
 
 # Dependencies
 .PHONY: depend
-depend: SOURCES=${shell find . -name '*.ml*' -print}
+depend: SOURCES=${shell find . -name '*.ml*' -print | sed -e s#./##}
 depend:
 	${OCAMLDEP} ${INCLUDES} -I src -I tests ${SOURCES} > .depend
 
