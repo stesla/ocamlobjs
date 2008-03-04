@@ -61,9 +61,13 @@ clean:
 	find . -name '*.o' -exec rm {} \;
 
 # Dependencies
-.PHONY: depend
+.PHONY: depend objs
 depend: SOURCES=${shell find . -name '*.ml*' -print | sed -e s#./##}
 depend:
 	${OCAMLDEP} ${INCLUDES} -I src -I tests ${SOURCES} > .depend
+
+objs: bin/byte/${PROGRAM}
+	bin/byte/${PROGRAM} src/main.cmo < .depend > .objs
+	bin/byte/${PROGRAM} tests/suite.cmo < .depend > .test_objs
 
 include .depend
