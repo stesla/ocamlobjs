@@ -18,11 +18,11 @@ let suite = "Dependency Analyzer" >:::
    "single level of deps" >::
    (fun () ->
      let deps = add "main.cmo" ["foo.cmo"; "bar.cmo"] empty in
-     test "bar.cmo foo.cmo main.cmo" deps "main.cmo");
+     test "foo.cmo bar.cmo main.cmo" deps "main.cmo");
 
    "more deps" >::
    (fun () ->
-     let deps = add "main.cmo" ["foo.cmo"; "bar.cmo"] empty in
+     let deps = add "main.cmo" ["bar.cmo"; "foo.cmo"] empty in
      let deps = add "foo.cmo" ["bar.cmo"; "baz.cmo"] deps in
      test "baz.cmo bar.cmo foo.cmo main.cmo" deps "main.cmo")]
 
