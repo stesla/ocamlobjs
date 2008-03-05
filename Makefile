@@ -21,11 +21,14 @@ all: bin/byte/${PROGRAM}
 test: bin/byte/tests
 	bin/byte/tests
 
-bin/byte/${PROGRAM}: ${OBJS}
+bin/byte:
+	mkdir -p bin/byte
+
+bin/byte/${PROGRAM}: bin/byte ${OBJS}
 	${OCAMLC} -o $@ ${OCAMLFLAGS} ${OBJS}
 
 bin/byte/tests: INCLUDES += ${TEST_INCLUDES}
-bin/byte/tests: ${TEST_OBJS}
+bin/byte/tests: bin/byte ${TEST_OBJS}
 	${OCAMLC} -o $@ ${OCAMLFLAGS} ${TEST_OBJS}
 
 # Targets for building native-compiled executables
@@ -34,11 +37,14 @@ opt: bin/opt/${PROGRAM}
 test-opt: bin/opt/tests
 	bin/opt/tests
 
-bin/opt/${PROGRAM}: ${XOBJS}
+bin/opt:
+	mkdir -p bin/opt
+
+bin/opt/${PROGRAM}: bin/opt ${XOBJS}
 	${OCAMLOPT} -o $@ ${OCAMLOPTFLAGS} ${XOBJS}
 
 bin/opt/tests: INCLUDES += ${TEST_INCLUDES}
-bin/opt/tests: ${TEST_XOBJS}
+bin/opt/tests: bin/opt ${TEST_XOBJS}
 	${OCAMLOPT} -o $@ ${OCAMLOPTFLAGS} ${TEST_XOBJS}
 
 # Common rules
