@@ -24,13 +24,21 @@ let suite = "Dependency Analyzer" >:::
    (fun () ->
      let deps = add "main.cmo" ["bar.cmo"; "foo.cmo"] empty in
      let deps = add "foo.cmo" ["bar.cmo"; "baz.cmo"] deps in
-     test "baz.cmo bar.cmo foo.cmo main.cmo" deps "main.cmo");
+     test "bar.cmo baz.cmo foo.cmo main.cmo" deps "main.cmo");
 
    "deps with interfaces" >::
    (fun () ->
      let deps = add "main.cmo" ["bar.cmo"; "foo.cmi"] empty in
      let deps = add "foo.cmi" ["baz.cmo"] deps in
      let deps = add "foo.cmo" ["baz.cmo"; "foo.cmi"] deps in
-     test "baz.cmo bar.cmo foo.cmo main.cmo" deps "main.cmo")]
+     test "baz.cmo bar.cmo foo.cmo main.cmo" deps "main.cmo");
+
+   "deeper tree" >::
+   (fun () ->
+     let deps = add "main.cmo" ["foo.cmo"] empty in
+     let deps = add "foo.cmo" ["bar.cmo"] deps in
+     let deps = add "bar.cmo" ["baz.cmo"] deps in
+     let deps = add "baz.cmo" ["quux.cmo"] deps in
+     test "quux.cmo baz.cmo bar.cmo foo.cmo main.cmo" deps "main.cmo")]
 
 
